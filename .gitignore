@@ -1,0 +1,5 @@
+*.env
+!empty.env
+
+node_modules/
+.build/

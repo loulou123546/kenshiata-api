@@ -1,0 +1,19 @@
+{
+  "name": "kenshiata-api",
+  "version": "0.0.0",
+  "description": "A fresh new Architect project!",
+  "scripts": {
+    "dev": "npx sandbox"
+  },
+  "devDependencies": {
+    "@architect/architect": "^11.2.2",
+    "@architect/plugin-typescript": "^2.1.0",
+    "@aws-sdk/lib-dynamodb": "^3.821.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@architect/functions": "^8.1.9",
+    "@architect/sandbox": "^7.0.0",
+    "@aws-sdk/client-dynamodb": "^3.821.0"
+  }
+}
