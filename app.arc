@@ -1,9 +1,27 @@
 @app
 kenshiata-api
 
+@aws
+region eu-west-1
+runtime typescript
+
+@plugins
+architect/plugin-typescript
+remove-static-bucket
+
+@typescript
+esbuild-config esbuild-config.cjs
+base-runtime nodejs22.x
+
+
 @http
+
 get /
 options /*
+
+/players/online
+  method get
+  src src/http/players/get-online
 
 /webrtc/init
   method post
@@ -22,19 +40,24 @@ options /*
   src src/http/webrtc/get-answers
 
 
-@aws
-region eu-west-1
-runtime typescript
+@ws
+player-online
+play-together-request
+play-together-response
 
-@plugins
-architect/plugin-typescript
-remove-static-bucket
+webrtc-send-description
+webrtc-send-ice-candidate
 
-@typescript
-esbuild-config esbuild-config.cjs
-base-runtime nodejs22.x
 
 @tables
+
+sockets
+  socketId *String
+  expires TTL
+
+playersOnline
+  username *String
+  expires TTL
 
 webrtc
   id *String

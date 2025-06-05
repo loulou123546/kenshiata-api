@@ -2,14 +2,14 @@ import arc from '@architect/functions';
 import { getAnswers } from 'shared/webrtc';
 
 export const handler = arc.http(async req => {
-  if (typeof req.params.username !== 'string') {
+  if (typeof req.params.id !== 'string') {
     return {
       status: 400,
     cors: true,
       json: { error: 'Invalid username' }
     };
   }
-  const username = req.params.username;
+  const username = req.params.id;
 
   try {
     const data = await getAnswers(username);
@@ -19,6 +19,7 @@ export const handler = arc.http(async req => {
       json: data
     };
   }
+
   catch (error) {
     console.error('Error fetching answer:', username, error);
     return {

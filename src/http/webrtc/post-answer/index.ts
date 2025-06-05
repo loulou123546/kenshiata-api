@@ -5,7 +5,7 @@ export const handler = arc.http(async req => {
   try {
     const data = Answer.parse(req.body);
 
-    await registerAnswer(data.username, data.data);
+    await registerAnswer(data.username, data.data, data.target);
     return {
       status: 200,
     cors: true,

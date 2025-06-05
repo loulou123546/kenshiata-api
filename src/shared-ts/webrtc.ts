@@ -14,6 +14,7 @@ export type Offer = z.infer<typeof Offer>;
 
 export const Answer = z.object({
     username: z.string().min(1, 'Username is required'),
+    target: z.string().min(1, 'Target is required'),
     data: z.string()
 })
 export type Answer = z.infer<typeof Answer>;
@@ -24,10 +25,10 @@ export async function registerOffer(username: string, data: string): Promise<voi
     await client.put({ ...existing, id: username, offer: data, expires: Date.now() + 1000 * 3600 }); // 1 hour expiry
 }
 
-export async function registerAnswer(username: string, data: string): Promise<void> {
+export async function registerAnswer(username: string, data: string, target: string): Promise<void> {
     const client = (await arc.tables()).webrtc;
-    const existing = await client.get({ id: username });
-    await client.put({ ...existing, id: username, answer: data, expires: Date.now() + 1000 * 3600 }); // 1 hour expiry
+    const existing = await client.get({ id: target });
+    await client.put({ ...existing, id: target, answer: data, answer_by: username, expires: Date.now() + 1000 * 3600 }); // 1 hour expiry
 }
 
 export async function getOffers(): Promise<Offer[]> {
@@ -45,5 +46,5 @@ export async function getOffers(): Promise<Offer[]> {
 export async function getAnswers(username: string): Promise<Answer> {
     const client = (await arc.tables()).webrtc;
     const answer = await client.get({ id: username });
-    return Answer.parse({ username: answer.id, data: answer.answer });
+    return Answer.parse({ username: answer.id, data: answer.answer, target: answer.answer_by });
 }
