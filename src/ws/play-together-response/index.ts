@@ -8,7 +8,7 @@ export const handler = async (event: APIGatewayProxyWebsocketEventV2, context: C
     console.error('Socket ID mismatch:', data.from.socketId, connectionId);
     return { statusCode: 200 };
   }
-  arc.ws.send({
+  await arc.ws.send({
     id: data.target.socketId,
     payload: event.body
   });
