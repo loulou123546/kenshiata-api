@@ -41,7 +41,7 @@ options /*
 
 
 @ws
-player-online
+set-player
 play-together-request
 play-together-response
 
