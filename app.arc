@@ -47,6 +47,7 @@ play-together-response
 
 webrtc-send-description
 webrtc-send-ice-candidate
+game-data
 
 
 @tables
