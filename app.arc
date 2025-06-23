@@ -23,21 +23,18 @@ options /*
   method get
   src src/http/players/get-online
 
-/webrtc/init
-  method post
-  src src/http/webrtc/post-init
-/webrtc/offer
-  method post
-  src src/http/webrtc/post-offer
-/webrtc/offers
+/characters
   method get
-  src src/http/webrtc/get-offers
-/webrtc/answer
+  src src/http/characters/list
+/characters
   method post
-  src src/http/webrtc/post-answer
-/webrtc/answer/:id
-  method get
-  src src/http/webrtc/get-answers
+  src src/http/characters/create
+/characters
+  method put
+  src src/http/characters/put
+/characters
+  method delete
+  src src/http/characters/delete
 
 
 @ws
@@ -45,8 +42,6 @@ set-player
 play-together-request
 play-together-response
 
-webrtc-send-description
-webrtc-send-ice-candidate
 game-data
 
 
@@ -60,7 +55,7 @@ playersOnline
   username *String
   expires TTL
 
-webrtc
-  id *String
-  expires TTL
-  encrypt true
+characters
+  userId *String
+  id **String
+
