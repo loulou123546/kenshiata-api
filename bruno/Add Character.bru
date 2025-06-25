@@ -1,0 +1,18 @@
+meta {
+  name: Add Character
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{host}}/characters
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "avatar": "boykisser.jpg",
+    "name": "UwU boy"
+  }
+}

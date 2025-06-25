@@ -1,0 +1,18 @@
+meta {
+  name: Delete Character
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{host}}/characters
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "userId": "8205c4d4-e081-70d3-7de7-eec4cbae1592",
+    "id": "0197a046-3573-718d-b4c5-c485f08aa5e4"
+  }
+}

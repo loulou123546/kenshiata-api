@@ -46,6 +46,10 @@ export async function newCharacter(userId: string, newCharacter: NewCharacter): 
 
 export async function updateCharacter(character: Character): Promise<Character> {
     const client = (await arc.tables()).characters;
+    const oldCharacter = await client.get({ userId: character.userId, id: character.id });
+    if (!oldCharacter) {
+        throw new Error('Character not found');
+    }
     await client.put(character);
     return character;
 }

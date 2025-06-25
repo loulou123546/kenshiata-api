@@ -1,12 +1,14 @@
 import { type HttpRequest, type HttpResponse } from "@architect/functions/types/http";
 import * as jose from 'jose'
 
+export type UserIdentity = {
+    id: string,
+    username: string,
+    groups: string[]
+}
+
 export type AuthHttpRequest = HttpRequest & {
-    user?: {
-        id: string,
-        username: string,
-        groups: string[]
-    }
+    user?: UserIdentity
 }
 
 export function authRequired (inOneOfGroups: string[] | undefined = undefined): (req: AuthHttpRequest) => Promise<HttpResponse | undefined> {

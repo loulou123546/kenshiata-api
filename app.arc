@@ -19,10 +19,6 @@ base-runtime nodejs22.x
 get /
 options /*
 
-/players/online
-  method get
-  src src/http/players/get-online
-
 /characters
   method get
   src src/http/characters/list
@@ -36,9 +32,20 @@ options /*
   method delete
   src src/http/characters/delete
 
+/gamerooms/:id/names
+  method get
+  src src/http/gamerooms/names
+
+post /open-socket
 
 @ws
-set-player
+create-game-room
+list-game-rooms
+request-join-room
+respond-join-room
+invite-to-room
+respond-to-invite
+
 play-together-request
 play-together-response
 
@@ -48,8 +55,11 @@ game-data
 @tables
 
 sockets
-  socketId *String
+  id *String
   expires TTL
+
+gameRooms
+  hostId *String
 
 playersOnline
   username *String
