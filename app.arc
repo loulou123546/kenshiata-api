@@ -45,6 +45,7 @@ request-join-room
 respond-join-room
 invite-to-room
 respond-to-invite
+leave-room
 
 play-together-request
 play-together-response
