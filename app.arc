@@ -36,6 +36,10 @@ options /*
   method get
   src src/http/gamerooms/names
 
+/stories/available
+  method get
+  src src/http/stories/list-available
+
 post /open-socket
 
 @ws
@@ -47,11 +51,10 @@ invite-to-room
 respond-to-invite
 leave-room
 
-play-together-request
-play-together-response
-
-game-data
-
+start-game
+session-broadcast
+vote-story
+player-ready
 
 @tables
 
@@ -61,6 +64,9 @@ sockets
 
 gameRooms
   hostId *String
+
+gameSessions
+  id *String
 
 playersOnline
   username *String
