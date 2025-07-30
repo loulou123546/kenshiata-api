@@ -39,6 +39,9 @@ options /*
 /stories/available
   method get
   src src/http/stories/list-available
+/stories/:id
+  method get
+  src src/http/stories/get-metadata
 
 post /open-socket
 
