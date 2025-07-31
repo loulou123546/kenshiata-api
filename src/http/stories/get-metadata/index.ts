@@ -8,20 +8,12 @@ export const handler = arc.http(authRequired(), async (req: AuthHttpRequest) => 
     const storyId = req.params?.id;
     const ink = await getTestStory(storyId);
 
-    const roles: {tag: string, name: string}[] = []
-    ink.global?.roles?.split(",")?.forEach((el: string) => {
-      const parts = el.split("=").map(p => p.trim());
-      if (parts.length < 2 || parts[0] === "" || parts[1] === "") return;
-      roles.push({tag: parts[0], name: parts[1]});
-    })
-
     return {
       status: 200,
       cors: true,
       json: {
-        id: storyId,
-        title: ink.global?.title,
-        roles
+        ...ink.metadata,
+        id: storyId
       }
     }
   }

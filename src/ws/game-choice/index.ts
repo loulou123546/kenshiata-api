@@ -2,28 +2,20 @@ import { Context, APIGatewayProxyResultV2, APIGatewayProxyWebsocketEventV2 } fro
 import arc from '@architect/functions';
 import { z } from 'zod';
 import { type GameSession, getGameSession, updateGameSession } from 'shared/game-sessions';
-import { getStory } from 'shared/game-stories';
 import { getTestStory } from 'shared/ink-run';
 
 const StoryVoteSchema = z.object({
   sessionId: z.string(),
-  storyId: z.string().uuid(),
+  choiceIndex: z.number(),
 })
 
-function verifyAgreeOnVote (session: GameSession): string | false {
-  if (session.players.length < 1) return false;
-  const firstVote = session.players[0].data?.storyVote;
-  if (!firstVote || typeof firstVote !== "string") return false;
-
-  for (const player of session.players) {
-    if (player.data?.storyVote !== firstVote) return false;
-  }
-  return firstVote;
+function verifyAgreeOnVote (session: GameSession): number {
+  return -1;
 }
 
 export const handler = async (event: APIGatewayProxyWebsocketEventV2, context: Context): Promise<APIGatewayProxyResultV2> => {
   const connectionId = event.requestContext.connectionId;
-  const {sessionId, storyId} = StoryVoteSchema.parse(JSON.parse(event.body));
+  const {sessionId, choiceIndex} = StoryVoteSchema.parse(JSON.parse(event.body));
   
   const session = await getGameSession(sessionId);
   let playerIndex = undefined;
@@ -36,39 +28,29 @@ export const handler = async (event: APIGatewayProxyWebsocketEventV2, context: C
   })
   if (!player || playerIndex === undefined) {
     return { statusCode: 403, body: JSON.stringify({ error: 'Forbidden' }) };
-  }
+  }  
 
-  if (!session.players[playerIndex]?.data) session.players[playerIndex].data = {};
-  session.players[playerIndex].data.storyVote = storyId;
 
-  const agreement = verifyAgreeOnVote(session);
-  if (agreement) {
+  const agreement = choiceIndex;//verifyAgreeOnVote(session);
+  if (agreement >= 0) {
     // Vote finished
 
-    if (!session?.data) session.data = {};
-    session.data.story = await getStory(agreement);
-    const story_ink = await getTestStory(agreement);
-    session.data.ink = {
-      id: agreement,
-      metadata: story_ink.metadata
-    }
-    if (story_ink.metadata?.gamemode === "each-player-have-role") {
-      session.data.roles_player = {};
-      Object.values(story_ink.metadata.roles).forEach(el => {
-        session.data.roles_player[el.tag] = -1;
-      })
-    }
-    for (const player of session.players) {
-      delete player.data.storyVote;
-    }
     
+    const ink = getTestStory(session.data.ink.id);
+    if (session.data.ink?.state) ink.status = session.data.ink.state;
+
+    ink.chooseChoice(agreement);
+    const ink_data = ink.runLines();
+
+    session.data.ink.state = ink.status;
     await updateGameSession(session);
+    
     await Promise.allSettled(session.players.map(p => {
       return arc.ws.send({
         id: p.socketId,
         payload: JSON.stringify({
-          action: "start-story",
-          session_data: session.data
+          action: "game-continue",
+          ink_data
         })
       });
     }));
@@ -82,9 +64,9 @@ export const handler = async (event: APIGatewayProxyWebsocketEventV2, context: C
       return arc.ws.send({
         id: p.socketId,
         payload: JSON.stringify({
-          action: "vote-story",
+          action: "game-choice",
           userId: player.userId,
-          storyId
+          choiceIndex
         })
       });
     }));

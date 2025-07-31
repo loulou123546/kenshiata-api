@@ -2,6 +2,7 @@ import { Context, APIGatewayProxyResultV2, APIGatewayProxyWebsocketEventV2 } fro
 import arc from '@architect/functions';
 import { z } from 'zod';
 import { type GameSession, getGameSession, updateGameSession } from 'shared/game-sessions';
+import { getTestStory } from 'shared/ink-run';
 
 const PlayerReadySchema = z.object({
   sessionId: z.string(),
@@ -16,16 +17,17 @@ const PlayerReadySchema = z.object({
   })
 })
 
-// function verifyAgreeOnVote (session: GameSession): string | false {
-//   if (session.players.length < 1) return false;
-//   const firstVote = session.players[0].data?.storyVote;
-//   if (!firstVote || typeof firstVote !== "string") return false;
+function verifyAgreeOnVote (session: GameSession): boolean {
+  const gamemode = session.data?.ink?.metadata?.gamemode;
+  if (!gamemode) return false;
 
-//   for (const player of session.players) {
-//     if (player.data?.storyVote !== firstVote) return false;
-//   }
-//   return firstVote;
-// }
+  if (gamemode === "each-player-have-role") {
+    return Object.keys(session.data.roles_player).every(key => {
+      return session.data.roles_player[key] != -1;
+    });
+  }
+  return false;
+}
 
 export const handler = async (event: APIGatewayProxyWebsocketEventV2, context: Context): Promise<APIGatewayProxyResultV2> => {
   const connectionId = event.requestContext.connectionId;
@@ -47,29 +49,41 @@ export const handler = async (event: APIGatewayProxyWebsocketEventV2, context: C
   if (!session.players[playerIndex]?.data) session.players[playerIndex].data = {};
   session.players[playerIndex].data.avatar = character.avatar;
   session.players[playerIndex].data.character_name = character.name;
+  session.data.roles_player[role?.tag] = playerIndex;
 
-//   const agreement = verifyAgreeOnVote(session);
-//   if (agreement) {
-//     if (!session?.data) session.data = {};
-//     session.data.story = await getStory(agreement);
-//     for (const player of session.players) {
-//       delete player.data.storyVote;
-//     }
+  // first save
+  await updateGameSession(session);
 
-//     await updateGameSession(session);
-//     await Promise.allSettled(session.players.map(p => {
-//       return arc.ws.send({
-//         id: p.socketId,
-//         payload: JSON.stringify({
-//           action: "start-story",
-//           story: session.data.story
-//         })
-//       });
-//     }));
-//   }
-//   else {
+  const agreement = verifyAgreeOnVote(session);
+  if (agreement) {
+
+    await Promise.allSettled(session.players.map(p => {
+      return arc.ws.send({
+        id: p.socketId,
+        payload: JSON.stringify({
+          action: "game-running",
+          session: session
+        })
+      });
+    }));
+
+    const ink = getTestStory(session.data.ink.id);
+    const ink_data = ink.runLines();
+    // set ink.state after game-running message, so state is not sent to players (big and useless for them)
+    session.data.ink.state = ink.status;
     await updateGameSession(session);
-
+    
+    await Promise.allSettled(session.players.map(p => {
+      return arc.ws.send({
+        id: p.socketId,
+        payload: JSON.stringify({
+          action: "game-continue",
+          ink_data
+        })
+      });
+    }));
+  }
+  else {
     await Promise.allSettled(session.players.map(p => {
       return arc.ws.send({
         id: p.socketId,
@@ -80,7 +94,7 @@ export const handler = async (event: APIGatewayProxyWebsocketEventV2, context: C
         })
       });
     }));
-//   }
+  }
 
   return { statusCode: 200 }
 }

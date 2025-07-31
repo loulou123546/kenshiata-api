@@ -58,6 +58,7 @@ start-game
 session-broadcast
 vote-story
 player-ready
+game-choice
 
 @tables
 
