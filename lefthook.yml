@@ -1,0 +1,17 @@
+# EXAMPLE USAGE:
+#
+#   Refer for explanation to following link:
+#   https://lefthook.dev/configuration/
+
+# pre-commit:
+#   parallel: true
+#   commands:
+#     prettier:
+#       glob: "src/*.{js,ts,jsx,tsx,.astro,.svelte,.vue,.css,.mjs,.cjs,.json,.jsonc}"
+#       run: npx prettier --write {staged_files} && git add {staged_files}
+pre-commit:
+  commands:
+    check:
+      glob: "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc,astro,svelte,vue,css,md,mdx}"
+      run: npx @biomejs/biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {staged_files}
+      stage_fixed: true

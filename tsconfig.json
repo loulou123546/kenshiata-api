@@ -1,17 +1,18 @@
 {
-  "compilerOptions": {
-    "baseUrl": ".",
-    "skipLibCheck": true,
-    "target": "es2022",
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-    "paths": {
-      "shared/*": ["src/shared-ts/*"],
-      "shared": ["src/shared-ts"],
-      "@architect/shared/*": ["src/shared/*"],
-      "@architect/shared": ["src/shared"],
-      "@architect/views/*": ["src/views/*"],
-      "@architect/views": ["src/views"]
-    }
-  }
+	"compilerOptions": {
+		"baseUrl": ".",
+		"skipLibCheck": true,
+		"target": "es2022",
+		"module": "nodenext",
+		"moduleResolution": "nodenext",
+		"paths": {
+			"shared/*": ["src/shared-ts/*"],
+			"shared": ["src/shared-ts"],
+			"@shared/*": ["shared/*"],
+			"@architect/shared/*": ["src/shared/*"],
+			"@architect/shared": ["src/shared"],
+			"@architect/views/*": ["src/views/*"],
+			"@architect/views": ["src/views"]
+		}
+	}
 }
