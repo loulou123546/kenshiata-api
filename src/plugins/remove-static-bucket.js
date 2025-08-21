@@ -7,30 +7,30 @@
  */
 
 module.exports = {
-  deploy: {
-    start: async ({ cloudformation }) => {
-      delete cloudformation.Resources.StaticBucket;
-      delete cloudformation.Resources.StaticBucketPolicy;
-      delete cloudformation.Resources.StaticBucketParam;
+	deploy: {
+		start: async ({ cloudformation }) => {
+			delete cloudformation.Resources.StaticBucket;
+			delete cloudformation.Resources.StaticBucketPolicy;
+			delete cloudformation.Resources.StaticBucketParam;
 
-      for (const ressource of Object.values(cloudformation.Resources)) {
-        const props = ressource?.Properties;
-        if (props?.Environment?.Variables?.ARC_STATIC_BUCKET)
-          delete ressource.Properties.Environment.Variables.ARC_STATIC_BUCKET;
-        if (props?.DefinitionBody?.paths?.["/_static/{proxy+}"])
-          delete ressource.Properties.DefinitionBody.paths["/_static/{proxy+}"];
-        if (props?.Policies) {
-          for (let i = 0; i < props.Policies.length; i++) {
-            if (props.Policies[i]?.PolicyName.includes("Bucket")) {
-              props.Policies.splice(i, 1);
-              i--;
-            }
-          }
-        }
-      }
+			for (const ressource of Object.values(cloudformation.Resources)) {
+				const props = ressource?.Properties;
+				if (props?.Environment?.Variables?.ARC_STATIC_BUCKET)
+					delete ressource.Properties.Environment.Variables.ARC_STATIC_BUCKET;
+				if (props?.DefinitionBody?.paths?.["/_static/{proxy+}"])
+					delete ressource.Properties.DefinitionBody.paths["/_static/{proxy+}"];
+				if (props?.Policies) {
+					for (let i = 0; i < props.Policies.length; i++) {
+						if (props.Policies[i]?.PolicyName.includes("Bucket")) {
+							props.Policies.splice(i, 1);
+							i--;
+						}
+					}
+				}
+			}
 
-      delete cloudformation.Outputs.BucketURL;
-      return cloudformation;
-    },
-  },
+			delete cloudformation.Outputs.BucketURL;
+			return cloudformation;
+		},
+	},
 };
