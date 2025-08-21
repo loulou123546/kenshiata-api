@@ -1,27 +1,27 @@
 import arc from "@architect/functions";
 import { type AuthHttpRequest, authRequired } from "shared/auth";
-import { listCharacters } from "shared/characters";
+import { listStories } from "shared/game-stories";
 
 export const handler = arc.http(
 	authRequired(),
 	async (req: AuthHttpRequest) => {
 		try {
-			const user = req.user.id;
-			const characters = await listCharacters(user);
+			//const user = req.user.id
+			const stories = await listStories();
 
 			return {
 				status: 200,
 				cors: true,
 				json: {
-					data: characters,
+					data: stories,
 				},
 			};
 		} catch (error) {
-			console.error("Error listing characters:", error);
+			console.error("Error listing stories:", error);
 			return {
 				status: 500,
 				cors: true,
-				json: { data: [], error: "No characters found" },
+				json: { data: [], error: "No stories found" },
 			};
 		}
 	},

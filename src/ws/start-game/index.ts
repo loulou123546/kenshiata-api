@@ -8,12 +8,20 @@ import {
 	getGameRoomById,
 	updateGameRoom,
 } from "shared/game-rooms";
+import {
+	broadcastToGameSession,
+	convertGameRoomToSession,
+} from "shared/game-sessions";
 import { broadcastAllSockets, getIdentityBySocketId } from "shared/sockets";
 import { z } from "zod";
 
-const LeaveSchema = z.object({
+const StartGameSchema = z.object({
 	hostId: z.string().uuid(),
 });
+
+function delay(ms: number) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export const handler = async (
 	event: APIGatewayProxyWebsocketEventV2,
@@ -21,31 +29,31 @@ export const handler = async (
 ): Promise<APIGatewayProxyResultV2> => {
 	const connectionId = event.requestContext.connectionId;
 	try {
-		const { hostId } = LeaveSchema.parse(JSON.parse(event.body));
+		const { hostId } = StartGameSchema.parse(JSON.parse(event.body));
 
 		const requestFrom = await getIdentityBySocketId(connectionId);
-		if (requestFrom.socketId !== connectionId) {
+		if (
+			requestFrom.socketId !== connectionId ||
+			hostId !== requestFrom.user.id
+		) {
 			return { statusCode: 403, body: JSON.stringify({ error: "Forbidden" }) };
 		}
 		const room = await getGameRoomById(hostId);
-		if (!room.players.includes(requestFrom.user.id)) {
-			return { statusCode: 200 };
+		if (
+			!room.players.includes(requestFrom.user.id) ||
+			room.hostId !== requestFrom.user.id
+		) {
+			return { statusCode: 403, body: JSON.stringify({ error: "Forbidden" }) };
 		}
 
-		if (room.hostId !== requestFrom.user.id) {
-			const newRoom = await updateGameRoom({
-				...room,
-				players: room.players.filter(
-					(player) => player !== requestFrom.user.id,
-				),
-			});
-			await broadcastAllSockets({
-				action: "update-game-rooms",
-				updateRooms: [newRoom],
-			});
-		} else {
-			await deleteGameRoom(room.hostId, true);
-		}
+		const session = await convertGameRoomToSession(room);
+		await broadcastToGameSession(session, "start-game", {
+			hostId,
+			...session,
+		});
+
+		await delay(1000); // Give a second for client game to process start-game before deleting the room
+		await deleteGameRoom(room.hostId, true);
 
 		return { statusCode: 200 };
 	} catch (error) {
