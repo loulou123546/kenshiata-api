@@ -5,7 +5,9 @@ import type {
 	Context,
 } from "aws-lambda";
 import { createGameRoom } from "shared/game-rooms";
+import grafana from "shared/grafana";
 import { broadcastAllSockets, getIdentityBySocketId } from "shared/sockets";
+import { wrap_ws } from "shared/wrap";
 import { z } from "zod";
 
 const CreateGameRoomSchema = z.object({
@@ -13,7 +15,7 @@ const CreateGameRoomSchema = z.object({
 	name: z.string().min(1).max(256),
 });
 
-export const handler = async (
+export const main = async (
 	event: APIGatewayProxyWebsocketEventV2,
 	context: Context,
 ): Promise<APIGatewayProxyResultV2> => {
@@ -28,6 +30,11 @@ export const handler = async (
 			parsedData.is_public,
 			parsedData.name,
 		);
+		grafana
+			.log(
+				`Created new game room ${room.name} [${room.public ? "public" : "private"}]`,
+			)
+			.meta({ room });
 		if (parsedData.is_public) {
 			await broadcastAllSockets({
 				action: "update-game-rooms",
@@ -44,10 +51,12 @@ export const handler = async (
 		}
 		return { statusCode: 200 };
 	} catch (error) {
-		console.error("Error processing request:", error);
+		grafana.recordException(error);
 		return {
 			statusCode: 500,
 			body: JSON.stringify({ error: "Internal Server Error" }),
 		};
 	}
 };
+
+export const handler = wrap_ws(main);

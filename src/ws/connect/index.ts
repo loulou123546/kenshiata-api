@@ -3,9 +3,11 @@ import type {
 	APIGatewayProxyWebsocketEventV2,
 	Context,
 } from "aws-lambda";
+import grafana from "shared/grafana";
 import { associateSocketToUser } from "shared/sockets";
+import { wrap_ws } from "shared/wrap";
 
-export const handler = async (
+export const main = async (
 	event: APIGatewayProxyWebsocketEventV2,
 	context: Context,
 ): Promise<APIGatewayProxyResultV2> => {
@@ -20,7 +22,9 @@ export const handler = async (
 		await associateSocketToUser(connectId, token);
 		return { statusCode: 200 };
 	} catch (error) {
-		console.error("Error during socket authentication:", error);
+		grafana.recordException(error);
 		return { statusCode: 401 };
 	}
 };
+
+export const handler = wrap_ws(main);

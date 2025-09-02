@@ -38,3 +38,8 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: "eu-west-1"
+          LOKI_ENDPOINT: "https://logs-prod-039.grafana.net/loki/api/v1/push"
+          LOKI_AUTH: ${{ secrets.LOKI_AUTH }}
+          TRACES_ENDPOINT: "https://otlp-gateway-prod-eu-central-0.grafana.net/otlp/v1/traces"
+          TRACES_AUTH: ${{ secrets.TRACES_AUTH }}
+          RUNNING_ENV: "prod"

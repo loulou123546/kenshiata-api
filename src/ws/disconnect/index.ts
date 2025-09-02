@@ -4,8 +4,9 @@ import type {
 	Context,
 } from "aws-lambda";
 import { closeSocketBySocketId } from "shared/sockets";
+import { wrap_ws } from "shared/wrap";
 
-export const handler = async (
+export const main = async (
 	event: APIGatewayProxyWebsocketEventV2,
 	context: Context,
 ): Promise<APIGatewayProxyResultV2> => {
@@ -17,3 +18,5 @@ export const handler = async (
 	}
 	return { statusCode: 200 };
 };
+
+export const handler = wrap_ws(main);

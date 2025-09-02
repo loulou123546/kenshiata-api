@@ -2,10 +2,11 @@ import arc from "@architect/functions";
 import { Character } from "@shared/types/Character";
 import { type AuthHttpRequest, authRequired } from "shared/auth";
 import { updateCharacter } from "shared/characters";
+import grafana from "shared/grafana";
+import { wrap_http } from "shared/wrap";
 
-export const handler = arc.http(
-	authRequired(),
-	async (req: AuthHttpRequest) => {
+export const handler = wrap_http(
+	arc.http(authRequired(), async (req: AuthHttpRequest) => {
 		try {
 			const user = req.user.id;
 			const character = Character.safeParse(req.body);
@@ -24,6 +25,9 @@ export const handler = arc.http(
 				};
 			}
 			const updatedCharacter = await updateCharacter(character.data);
+			grafana.log(`Character ${updatedCharacter.id} updated`).meta({
+				character: updatedCharacter,
+			});
 
 			return {
 				status: 200,
@@ -33,12 +37,12 @@ export const handler = arc.http(
 				},
 			};
 		} catch (error) {
-			console.error("Error updating character:", error);
+			grafana.recordException(error);
 			return {
 				status: 500,
 				cors: true,
 				json: { data: {}, error: "Failed to update character" },
 			};
 		}
-	},
+	}),
 );
