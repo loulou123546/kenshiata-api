@@ -4,10 +4,12 @@ kenshiata-api
 @aws
 region eu-west-1
 runtime typescript
+timeout 30
 
 @plugins
 architect/plugin-typescript
 remove-static-bucket
+set-env
 
 @typescript
 esbuild-config esbuild-config.cjs

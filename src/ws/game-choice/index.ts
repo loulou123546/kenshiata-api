@@ -7,6 +7,7 @@ import type {
 } from "aws-lambda";
 import { getGameSession, updateGameSession } from "shared/game-sessions";
 import { getTestStory } from "shared/ink-run";
+import { wrap_ws } from "shared/wrap";
 import { z } from "zod";
 
 const StoryVoteSchema = z.object({
@@ -18,7 +19,7 @@ function verifyAgreeOnVote(session: GameSession): number {
 	return -1;
 }
 
-export const handler = async (
+export const main = async (
 	event: APIGatewayProxyWebsocketEventV2,
 	context: Context,
 ): Promise<APIGatewayProxyResultV2> => {
@@ -85,3 +86,5 @@ export const handler = async (
 
 	return { statusCode: 200 };
 };
+
+export const handler = wrap_ws(main);

@@ -1,10 +1,11 @@
 import arc from "@architect/functions";
 import { type AuthHttpRequest, authRequired } from "shared/auth";
 import { listStories } from "shared/game-stories";
+import grafana from "shared/grafana";
+import { wrap_http } from "shared/wrap";
 
-export const handler = arc.http(
-	authRequired(),
-	async (req: AuthHttpRequest) => {
+export const handler = wrap_http(
+	arc.http(authRequired(), async (req: AuthHttpRequest) => {
 		try {
 			//const user = req.user.id
 			const stories = await listStories();
@@ -17,12 +18,12 @@ export const handler = arc.http(
 				},
 			};
 		} catch (error) {
-			console.error("Error listing stories:", error);
+			grafana.recordException(error);
 			return {
 				status: 500,
 				cors: true,
 				json: { data: [], error: "No stories found" },
 			};
 		}
-	},
+	}),
 );

@@ -5,11 +5,13 @@ import type {
 	Context,
 } from "aws-lambda";
 import { getGameRoomById, updateGameRoom } from "shared/game-rooms";
+import grafana from "shared/grafana";
 import {
 	broadcastAllSockets,
 	getIdentityBySocketId,
 	getIdentityByUserId,
 } from "shared/sockets";
+import { wrap_ws } from "shared/wrap";
 import { z } from "zod";
 
 const JoinSchema = z.object({
@@ -18,7 +20,7 @@ const JoinSchema = z.object({
 	accept: z.boolean(),
 });
 
-export const handler = async (
+export const main = async (
 	event: APIGatewayProxyWebsocketEventV2,
 	context: Context,
 ): Promise<APIGatewayProxyResultV2> => {
@@ -60,10 +62,12 @@ export const handler = async (
 
 		return { statusCode: 200 };
 	} catch (error) {
-		console.error("Error processing request:", error);
+		grafana.recordException(error);
 		return {
 			statusCode: 500,
 			body: JSON.stringify({ error: "Internal Server Error" }),
 		};
 	}
 };
+
+export const handler = wrap_ws(main);

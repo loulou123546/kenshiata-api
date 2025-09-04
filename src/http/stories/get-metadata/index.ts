@@ -1,10 +1,11 @@
 import arc from "@architect/functions";
 import { type AuthHttpRequest, authRequired } from "shared/auth";
+import grafana from "shared/grafana";
 import { getTestStory } from "shared/ink-run";
+import { wrap_http } from "shared/wrap";
 
-export const handler = arc.http(
-	authRequired(),
-	async (req: AuthHttpRequest) => {
+export const handler = wrap_http(
+	arc.http(authRequired(), async (req: AuthHttpRequest) => {
 		try {
 			//const user = req.user.id
 			const storyId = req.params?.id;
@@ -19,12 +20,12 @@ export const handler = arc.http(
 				},
 			};
 		} catch (error) {
-			console.error("Error fetching metadata of story:", error);
+			grafana.recordException(error);
 			return {
 				status: 500,
 				cors: true,
 				json: { data: [], error: "No story found" },
 			};
 		}
-	},
+	}),
 );

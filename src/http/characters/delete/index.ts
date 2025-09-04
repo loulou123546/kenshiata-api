@@ -2,10 +2,11 @@ import arc from "@architect/functions";
 import { CharacterId } from "@shared/types/Character";
 import { type AuthHttpRequest, authRequired } from "shared/auth";
 import { deleteCharacter } from "shared/characters";
+import grafana from "shared/grafana";
+import { wrap_http } from "shared/wrap";
 
-export const handler = arc.http(
-	authRequired(),
-	async (req: AuthHttpRequest) => {
+export const handler = wrap_http(
+	arc.http(authRequired(), async (req: AuthHttpRequest) => {
 		try {
 			const user = req.user.id;
 			const character = CharacterId.safeParse(req.body);
@@ -23,6 +24,9 @@ export const handler = arc.http(
 					json: { data: {}, error: "Forbidden" },
 				};
 			}
+			grafana.log(`Character ${character.data.id} deleted`).meta({
+				character: character.data,
+			});
 			await deleteCharacter(character.data);
 
 			return {
@@ -30,12 +34,12 @@ export const handler = arc.http(
 				cors: true,
 			};
 		} catch (error) {
-			console.error("Error deleting character:", error);
+			grafana.recordException(error);
 			return {
 				status: 500,
 				cors: true,
 				json: { data: {}, error: "Failed to delete character" },
 			};
 		}
-	},
+	}),
 );

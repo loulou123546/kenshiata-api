@@ -5,6 +5,7 @@ import type {
 	Context,
 } from "aws-lambda";
 import { getGameSession } from "shared/game-sessions";
+import { wrap_ws } from "shared/wrap";
 import { z } from "zod";
 
 const BroadcastSchema = z.object({
@@ -13,7 +14,7 @@ const BroadcastSchema = z.object({
 	internal_payload: z.any(),
 });
 
-export const handler = async (
+export const main = async (
 	event: APIGatewayProxyWebsocketEventV2,
 	context: Context,
 ): Promise<APIGatewayProxyResultV2> => {
@@ -40,3 +41,5 @@ export const handler = async (
 	);
 	return { statusCode: 200 };
 };
+
+export const handler = wrap_ws(main);

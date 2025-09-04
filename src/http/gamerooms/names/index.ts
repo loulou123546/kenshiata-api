@@ -2,11 +2,12 @@ import arc from "@architect/functions";
 import type { UserIdentity } from "@shared/types/User";
 import { type AuthHttpRequest, authRequired } from "shared/auth";
 import { getGameRoomById } from "shared/game-rooms";
+import grafana from "shared/grafana";
 import { getIdentityByUserId } from "shared/sockets";
+import { wrap_http } from "shared/wrap";
 
-export const handler = arc.http(
-	authRequired(),
-	async (req: AuthHttpRequest) => {
+export const handler = wrap_http(
+	arc.http(authRequired(), async (req: AuthHttpRequest) => {
 		try {
 			const user = req.user;
 			const gameRoomId = req.params?.id;
@@ -50,12 +51,12 @@ export const handler = arc.http(
 				},
 			};
 		} catch (error) {
-			console.error("Error creating socket authentification:", error);
+			grafana.recordException(error);
 			return {
 				status: 500,
 				cors: true,
 				json: { data: {}, error: "Failed to create socket authentification" },
 			};
 		}
-	},
+	}),
 );
