@@ -43,3 +43,11 @@ jobs:
           TRACES_ENDPOINT: "https://otlp-gateway-prod-eu-central-0.grafana.net/otlp/v1/traces"
           TRACES_AUTH: ${{ secrets.TRACES_AUTH }}
           RUNNING_ENV: "prod"
+      - name: Trigger deployment for Websocket API
+        uses: nicholasarvelo/aws-cli-commands@v1
+        with:
+          args: apigatewayv2 create-deployment --api-id nh7fhbr5s1 --stage-name production
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: "eu-west-1"
