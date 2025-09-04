@@ -9,6 +9,7 @@ timeout 30
 @plugins
 architect/plugin-typescript
 remove-static-bucket
+iam-permissions
 set-env
 
 @typescript
@@ -43,7 +44,20 @@ options /*
   src src/http/stories/list-available
 /stories/:id
   method get
+  src src/http/stories/get-id
+/stories/metadata/:id
+  method get
   src src/http/stories/get-metadata
+/stories/by_author/:author
+  method get
+  src src/http/stories/by-author
+/stories
+  method post
+  src src/http/stories/new
+/stories/:id
+  method put
+  src src/http/stories/edit
+
 
 post /open-socket
 
@@ -82,3 +96,5 @@ characters
   userId *String
   id **String
 
+stories
+  id *String
