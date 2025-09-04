@@ -44,7 +44,7 @@ jobs:
           TRACES_AUTH: ${{ secrets.TRACES_AUTH }}
           RUNNING_ENV: "prod"
       - name: Trigger deployment for Websocket API
-        uses: nicholasarvelo/aws-cli-commands@v1
+        uses: nicholasarvelo/aws-cli-commands@v1.0.1
         with:
           args: apigatewayv2 create-deployment --api-id nh7fhbr5s1 --stage-name production
         env:
