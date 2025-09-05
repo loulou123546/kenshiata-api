@@ -48,7 +48,7 @@ options /*
 /stories/metadata/:id
   method get
   src src/http/stories/get-metadata
-/stories/by_author/:author
+/stories/by-author/:author
   method get
   src src/http/stories/by-author
 /stories

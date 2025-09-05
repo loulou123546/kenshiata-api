@@ -7,7 +7,8 @@ import { wrap_http } from "shared/wrap";
 export const handler = wrap_http(
 	arc.http(authRequired(), async (req: AuthHttpRequest) => {
 		try {
-			const author = req.params?.author;
+			let author = req.params?.author;
+			if (author === "me") author = req.user.id;
 			const stories = await listStories();
 
 			return {

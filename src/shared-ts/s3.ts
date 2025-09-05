@@ -83,7 +83,6 @@ class S3 {
 	constructor(bucket: string, options: S3ClientConfig) {
 		this.bucket = bucket;
 		this.client = new S3Client({
-			forcePathStyle: process.env?.AWS_S3_FORCE_PATH_STYLE === "true",
 			...options,
 		});
 	}
