@@ -16,7 +16,14 @@ const StoryVoteSchema = z.object({
 });
 
 function verifyAgreeOnVote(session: GameSession): number {
-	return -1;
+	if (session.players.length < 1) return -1;
+	const firstVote = session.players[0].data?.choiceVote;
+	if (firstVote === undefined || firstVote < 0) return -1;
+
+	for (const player of session.players) {
+		if (player.data?.choiceVote !== firstVote) return -1;
+	}
+	return firstVote;
 }
 
 export const main = async (
@@ -40,6 +47,7 @@ export const main = async (
 	if (!player || playerIndex === undefined) {
 		return { statusCode: 403, body: JSON.stringify({ error: "Forbidden" }) };
 	}
+	session.players[playerIndex].data.choiceVote = choiceIndex;
 
 	//solo mode : const agreement = choiceIndex;
 	const agreement = verifyAgreeOnVote(session);
@@ -53,6 +61,10 @@ export const main = async (
 		const ink_data = ink.runLines();
 
 		session.data.ink.state = ink.status;
+
+		for (let i = 0; i < session.players.length; i++) {
+			session.players[i].data.choiceVote = -1;
+		}
 		await updateGameSession(session);
 
 		await Promise.allSettled(
