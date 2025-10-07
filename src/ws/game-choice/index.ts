@@ -41,7 +41,8 @@ export const main = async (
 		return { statusCode: 403, body: JSON.stringify({ error: "Forbidden" }) };
 	}
 
-	const agreement = choiceIndex; //verifyAgreeOnVote(session);
+	//solo mode : const agreement = choiceIndex;
+	const agreement = verifyAgreeOnVote(session);
 	if (agreement >= 0) {
 		// Vote finished
 
