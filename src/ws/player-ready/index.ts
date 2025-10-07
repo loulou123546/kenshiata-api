@@ -80,7 +80,7 @@ export const main = async (
 			}),
 		);
 
-		const ink = getTestStory(session.data.ink.id);
+		const ink = await getTestStory(session.data.ink.id);
 		const ink_data = ink.runLines();
 		// set ink.state after game-running message, so state is not sent to players (big and useless for them)
 		session.data.ink.state = ink.status;

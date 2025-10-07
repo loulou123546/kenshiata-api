@@ -58,6 +58,7 @@ export function wrap_http(handler: HandlerHttp): HandlerHttp {
 			await grafana.flush();
 			return res;
 		} catch (err) {
+			console.error(err);
 			await grafana.flush().catch(console.error);
 			return { statusCode: 500 };
 		}
@@ -101,6 +102,7 @@ export function wrap_ws(handler: HandlerWS): HandlerWS {
 			await grafana.flush();
 			return res;
 		} catch (err) {
+			console.error(err);
 			await grafana.flush().catch(console.error);
 			return { statusCode: 500 };
 		}

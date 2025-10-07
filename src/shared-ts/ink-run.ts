@@ -1,133 +1,8 @@
 import type { GameStoryMetadata } from "@shared/types/GameStory";
 import type { StoryLine, Storychoice } from "@shared/types/InkStory";
-import { Story } from "inkjs";
+import { Compiler, Story } from "inkjs/full";
+import { getStory } from "./game-stories";
 // https://github.com/inkle/ink/blob/master/Documentation/RunningYourInk.md#getting-started-with-the-runtime-api
-
-const STORY_TAGS = JSON.stringify({
-	inkVersion: 21,
-	root: [
-		[
-			"#",
-			"^title: The test story",
-			"/#",
-			"#",
-			"^roles: dog=Jimy's dog, dad=Jimy's super cool dad",
-			"/#",
-			"#",
-			"^gamemode: each-player-have-role",
-			"/#",
-			"^Early in the morning, sunday ",
-			"#",
-			"^narative",
-			"/#",
-			"\n",
-			"^dad: Hey Jimy, how ru ?",
-			"\n",
-			"^Jimy: Fine and you ?",
-			"\n",
-			[
-				"ev",
-				{ "^->": "0.18.$r1" },
-				{ "temp=": "$r" },
-				"str",
-				{ "->": ".^.s" },
-				[{ "#n": "$r1" }],
-				"/str",
-				"str",
-				"^Great!",
-				"/str",
-				"/ev",
-				{ "*": "0.c-0", flg: 22 },
-				{ s: ["#", "^enjoy ", "/#", { "->": "$r", var: true }, null] },
-			],
-			[
-				"ev",
-				{ "^->": "0.19.$r1" },
-				{ "temp=": "$r" },
-				"str",
-				{ "->": ".^.s" },
-				[{ "#n": "$r1" }],
-				"/str",
-				"str",
-				"^Amazing!",
-				"/str",
-				"/ev",
-				{ "*": "0.c-1", flg: 22 },
-				{ s: ["#", "^enjoy++ ", "/#", { "->": "$r", var: true }, null] },
-			],
-			{
-				"c-0": [
-					"ev",
-					{ "^->": "0.c-0.$r2" },
-					"/ev",
-					{ "temp=": "$r" },
-					{ "->": "0.18.s" },
-					[{ "#n": "$r2" }],
-					"^ dad: Great!",
-					"\n",
-					{ "->": "0.g-0" },
-					{ "#f": 5 },
-				],
-				"c-1": [
-					"ev",
-					{ "^->": "0.c-1.$r2" },
-					"/ev",
-					{ "temp=": "$r" },
-					{ "->": "0.19.s" },
-					[{ "#n": "$r2" }],
-					"^ dad: Amazingly!",
-					"\n",
-					{ "->": "0.g-0" },
-					{ "#f": 5 },
-				],
-				"g-0": [
-					"^Jimy: Why are you up so early? ",
-					"#",
-					"^happy",
-					"/#",
-					"\n",
-					"ev",
-					"str",
-					"^Go to movie theater",
-					"/str",
-					"/ev",
-					{ "*": ".^.c-2", flg: 20 },
-					"ev",
-					"str",
-					"^Go to amusement park",
-					"/str",
-					"/ev",
-					{ "*": ".^.c-3", flg: 20 },
-					{
-						"c-2": [
-							"^ Because today, we are going to see Shark2!",
-							"\n",
-							{ "->": "0.g-1" },
-							{ "#f": 5 },
-						],
-						"c-3": [
-							"^ Because Puy du Fou open at nine!",
-							"\n",
-							{ "->": "0.g-1" },
-							{ "#f": 5 },
-						],
-						"#f": 5,
-					},
-				],
-				"g-1": [
-					"^Jimy: YEAHHHH",
-					"\n",
-					"end",
-					["done", { "#f": 5, "#n": "g-2" }],
-					{ "#f": 5 },
-				],
-			},
-		],
-		"done",
-		{ "#f": 1 },
-	],
-	listDefs: {},
-});
 
 export class InkPlay {
 	story: Story;
@@ -135,11 +10,12 @@ export class InkPlay {
 
 	constructor(
 		id: string,
-		storyFile: string,
+		storyFile: string | Story,
 		status: string | undefined = undefined,
 	) {
 		this.id = id;
-		this.story = new Story(storyFile);
+		this.story =
+			typeof storyFile === "string" ? new Story(storyFile) : storyFile;
 		if (status !== undefined) {
 			this.story.state.LoadJson(status);
 		}
@@ -206,6 +82,9 @@ export class InkPlay {
 	}
 }
 
-export function getTestStory(id: string): InkPlay {
-	return new InkPlay(id, STORY_TAGS);
+export async function getTestStory(id: string): Promise<InkPlay> {
+	const raw_story = await getStory(id);
+	const build = new Compiler(raw_story.ink);
+	const story = build.Compile();
+	return new InkPlay(id, story);
 }

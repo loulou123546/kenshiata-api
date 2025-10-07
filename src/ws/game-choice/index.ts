@@ -45,7 +45,7 @@ export const main = async (
 	if (agreement >= 0) {
 		// Vote finished
 
-		const ink = getTestStory(session.data.ink.id);
+		const ink = await getTestStory(session.data.ink.id);
 		if (session.data.ink?.state) ink.status = session.data.ink.state;
 
 		ink.chooseChoice(agreement);
