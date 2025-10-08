@@ -32,6 +32,12 @@ function verifyAgreeOnVote(session: GameSession): boolean {
 			return session.data.roles_player[key] !== -1;
 		});
 	}
+	if (gamemode === "no-roles") {
+		for (const player of session.players) {
+			if (!player?.data?.avatar || !player?.data?.character_name) return false;
+		}
+		return true;
+	}
 	return false;
 }
 

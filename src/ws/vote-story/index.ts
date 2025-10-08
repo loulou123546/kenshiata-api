@@ -62,8 +62,8 @@ export const main = async (
 			id: agreement,
 			metadata: story_ink.metadata,
 		};
-		if (story_ink.metadata?.gamemode === "each-player-have-role") {
-			session.data.roles_player = {};
+		session.data.roles_player = {};
+		if (story_ink?.metadata?.roles) {
 			for (const role of Object.values(story_ink.metadata.roles)) {
 				session.data.roles_player[role.tag] = -1;
 			}
