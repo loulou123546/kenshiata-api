@@ -14,7 +14,7 @@ export const handler = wrap_http(
 				status: 200,
 				cors: true,
 				json: {
-					data: stories,
+					data: stories.filter((el) => el.public),
 				},
 			};
 		} catch (error) {

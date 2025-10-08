@@ -8,7 +8,11 @@ export const handler = wrap_http(
 	arc.http(authRequired(), async (req: AuthHttpRequest) => {
 		try {
 			let author = req.params?.author;
-			if (author === "me") author = req.user.id;
+			let only_public = true;
+			if (author === "me") {
+				author = req.user.id;
+				only_public = false;
+			}
 			const stories = await listStories();
 
 			return {
@@ -16,7 +20,9 @@ export const handler = wrap_http(
 				cors: true,
 				json: {
 					data: stories.filter(
-						(el) => el.author === author || el.authorId === author,
+						(el) =>
+							(el.author === author || el.authorId === author) &&
+							(el.public || !only_public),
 					),
 				},
 			};
