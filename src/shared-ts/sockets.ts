@@ -65,12 +65,12 @@ export async function closeSocketBySocketId(socketId: string): Promise<void> {
 	}
 	await client.delete({ id: `socket:${socketId}` });
 	if (socket.user?.id) {
-		await client.delete({ id: `user:${socket.user.id}`, socketId });
+		await client.delete({ id: `user:${socket.user.id}` });
 	}
 	try {
 		await arc.ws.close({ id: socketId });
 	} catch (error) {
-		console.error("Error closing socket:", error);
+		console.debug("Error closing socket, already closed:", error);
 	}
 }
 
