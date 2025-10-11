@@ -20,7 +20,8 @@
 	},
 	"dependencies": {
 		"@architect/functions": "^8.1.9",
-		"@architect/sandbox": "^7.0.0",
+		"@architect/sandbox": "^7.1.0",
+		"@aws-sdk/client-cognito-identity-provider": "^3.908.0",
 		"@aws-sdk/client-dynamodb": "^3.821.0",
 		"@aws-sdk/client-s3": "^3.882.0",
 		"inkjs": "^2.3.2",
