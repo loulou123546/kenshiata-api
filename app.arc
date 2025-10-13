@@ -67,6 +67,9 @@ options /*
 /auth/signup-confirm
   method post
   src src/http/auth/signup-confirm
+/auth/refresh
+  method post
+  src src/http/auth/refresh
 
 post /open-socket
 

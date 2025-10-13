@@ -8,6 +8,7 @@ import { SignupRequest, type SignupResponse } from "@shared/types/Auth";
 import { validateChallenge } from "shared/cloudflare-turnstile";
 import grafana from "shared/grafana";
 import { wrap_http } from "shared/wrap";
+import { LoginUsingSession } from "../signup-confirm/index";
 
 const client = new CognitoIdentityProviderClient({});
 
@@ -33,10 +34,7 @@ export async function StartSignUp(
 	if (output?.UserConfirmed && output?.Session) {
 		return {
 			userId: output.UserSub,
-			success: {
-				confirmed: output.UserConfirmed,
-				session_id: output.Session,
-			},
+			...(await LoginUsingSession(input.username, output.Session, ip)),
 		};
 	}
 	console.log(output);
