@@ -67,6 +67,7 @@ export const main = async (
 		session.players[playerIndex].data = {};
 	session.players[playerIndex].data.avatar = character.avatar;
 	session.players[playerIndex].data.character_name = character.name;
+	session.players[playerIndex].data.character_id = character.id;
 	session.data.roles_player[role?.tag] = playerIndex;
 
 	// first save
