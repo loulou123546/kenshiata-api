@@ -58,6 +58,18 @@ options /*
   method put
   src src/http/stories/edit
 
+/auth/login
+  method post
+  src src/http/auth/login
+/auth/signup
+  method post
+  src src/http/auth/signup
+/auth/signup-confirm
+  method post
+  src src/http/auth/signup-confirm
+/auth/refresh
+  method post
+  src src/http/auth/refresh
 
 post /open-socket
 
