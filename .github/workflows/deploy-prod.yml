@@ -43,6 +43,8 @@ jobs:
           TRACES_ENDPOINT: "https://otlp-gateway-prod-eu-central-0.grafana.net/otlp/v1/traces"
           TRACES_AUTH: ${{ secrets.TRACES_AUTH }}
           RUNNING_ENV: "prod"
+          COGNITO_CLIENT_ID: "203t0a306t5vkid4kdeto2hs2i"
+          CLOUDFLARE_TURNSTILE_SECRET: ${{ secrets.CLOUDFLARE_TURNSTILE_SECRET }}
       - name: Trigger deployment for Websocket API
         uses: nicholasarvelo/aws-cli-commands@v1.0.1
         with:
