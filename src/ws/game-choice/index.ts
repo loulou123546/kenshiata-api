@@ -6,7 +6,7 @@ import type {
 	Context,
 } from "aws-lambda";
 import { getGameSession, updateGameSession } from "shared/game-sessions";
-import { getTestStory } from "shared/ink-run";
+import { getPlayableStory } from "shared/ink-run";
 import { wrap_ws } from "shared/wrap";
 import { z } from "zod";
 
@@ -54,7 +54,7 @@ export const main = async (
 	if (agreement >= 0) {
 		// Vote finished
 
-		const ink = await getTestStory(session.data.ink.id);
+		const ink = await getPlayableStory(session.data.ink.id);
 		if (session.data.ink?.state) ink.status = session.data.ink.state;
 
 		ink.chooseChoice(agreement);

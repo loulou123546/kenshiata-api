@@ -7,7 +7,7 @@ import type {
 } from "aws-lambda";
 import { getGameSession, updateGameSession } from "shared/game-sessions";
 import { getStory } from "shared/game-stories";
-import { getTestStory } from "shared/ink-run";
+import { getPlayableStory } from "shared/ink-run";
 import { wrap_ws } from "shared/wrap";
 import { z } from "zod";
 
@@ -56,8 +56,8 @@ export const main = async (
 		// Vote finished
 
 		if (!session?.data) session.data = {};
-		session.data.story = await getStory(agreement);
-		const story_ink = await getTestStory(agreement);
+		session.data.story = await getStory(agreement, false);
+		const story_ink = await getPlayableStory(agreement);
 		session.data.ink = {
 			id: agreement,
 			metadata: story_ink.metadata,

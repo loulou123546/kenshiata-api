@@ -1,8 +1,10 @@
 import type { GameStoryMetadata } from "@shared/types/GameStory";
 import type { StoryLine, Storychoice } from "@shared/types/InkStory";
-import { Compiler, Story } from "inkjs/full";
-import { getStory } from "./game-stories";
+import { Story } from "inkjs/full";
 // https://github.com/inkle/ink/blob/master/Documentation/RunningYourInk.md#getting-started-with-the-runtime-api
+import s3client from "shared/s3";
+
+const s3 = s3client("kenshiata-data-prod");
 
 export class InkPlay {
 	story: Story;
@@ -82,9 +84,9 @@ export class InkPlay {
 	}
 }
 
-export async function getTestStory(id: string): Promise<InkPlay> {
-	const raw_story = await getStory(id);
-	const build = new Compiler(raw_story.ink);
-	const story = build.Compile();
+export async function getPlayableStory(id: string): Promise<InkPlay> {
+	const file = await s3.get(`stories/${id}.json`);
+	const built = await file.text();
+	const story = new Story(built);
 	return new InkPlay(id, story);
 }

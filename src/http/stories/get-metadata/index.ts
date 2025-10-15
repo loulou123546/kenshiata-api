@@ -1,7 +1,7 @@
 import arc from "@architect/functions";
 import { type AuthHttpRequest, authRequired } from "shared/auth";
 import grafana from "shared/grafana";
-import { getTestStory } from "shared/ink-run";
+import { getPlayableStory } from "shared/ink-run";
 import { wrap_http } from "shared/wrap";
 
 export const handler = wrap_http(
@@ -9,7 +9,7 @@ export const handler = wrap_http(
 		try {
 			//const user = req.user.id
 			const storyId = req.params?.id;
-			const ink = await getTestStory(storyId);
+			const ink = await getPlayableStory(storyId);
 
 			return {
 				status: 200,

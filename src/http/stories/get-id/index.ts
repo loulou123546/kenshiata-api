@@ -8,7 +8,7 @@ export const handler = wrap_http(
 	arc.http(authRequired(), async (req: AuthHttpRequest) => {
 		try {
 			const id = req.params?.id;
-			const story = await getStory(id);
+			const story = await getStory(id, true);
 
 			return {
 				status: 200,

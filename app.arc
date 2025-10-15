@@ -57,6 +57,9 @@ options /*
 /stories/:id
   method put
   src src/http/stories/edit
+/stories/publish
+  method post
+  src src/http/stories/publish
 
 /auth/login
   method post
