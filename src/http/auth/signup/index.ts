@@ -77,7 +77,7 @@ export const handler = wrap_http(
 			await validateChallenge(
 				data.turnstileToken,
 				"signup",
-				["https://kenshiata.studio", "https://kenshiata.com"],
+				["kenshiata.studio", "kenshiata.com"],
 				ip,
 			);
 			const auth = await StartSignUp(data, ip);
