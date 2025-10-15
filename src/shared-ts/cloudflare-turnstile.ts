@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export const TurnstileResponse = z.object({
 	success: z.boolean(),
-	challenge_ts: z.string(),
+	challenge_ts: z.string().optional(),
 	hostname: z.string().optional(),
 	"error-codes": z.array(z.string()),
 	action: z.string().optional(),

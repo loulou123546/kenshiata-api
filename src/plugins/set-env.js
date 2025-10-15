@@ -8,6 +8,8 @@ module.exports = {
 				"TRACES_ENDPOINT",
 				"TRACES_AUTH",
 				"RUNNING_ENV",
+				"COGNITO_CLIENT_ID",
+				"CLOUDFLARE_TURNSTILE_SECRET",
 			];
 			for (const key of keys) {
 				if (process.env?.[key] !== undefined) {
