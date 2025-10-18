@@ -1,3 +1,4 @@
+import { inspect } from "node:util";
 import {
 	type Attributes,
 	mapAttributes,
@@ -162,6 +163,9 @@ export class Span {
 			this.endTimeUnixNano = `${Date.now()}000000`;
 		}
 		ACTIVE_SPANS = ACTIVE_SPANS.filter((span) => span.spanId !== this.spanId);
+		console.log(
+			`[${Number(this.endTimeUnixNano) / 1000000 - Number(this.startTimeUnixNano) / 1000000} ms] ${this.name}\n\t${inspect(this.attributes, { breakLength: Number.POSITIVE_INFINITY })}`,
+		);
 	}
 
 	isRecording(): boolean {
