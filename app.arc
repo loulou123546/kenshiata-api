@@ -73,6 +73,12 @@ options /*
 /auth/refresh
   method post
   src src/http/auth/refresh
+/auth/forgot-password
+  method post
+  src src/http/auth/forgot-password
+/auth/password-reset
+  method post
+  src src/http/auth/password-reset
 
 post /open-socket
 
