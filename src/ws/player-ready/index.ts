@@ -88,6 +88,15 @@ export const main = async (
 		);
 
 		const ink = await getPlayableStory(session.data.ink.id);
+
+		const names = session.players.map((player) => player.data.character_name);
+		if (names.length <= 1) {
+			ink.setVariable("REAL_NAMES", names.join(", ")); // should be only one, so join() is not used
+		} else {
+			const last = names.pop();
+			ink.setVariable("REAL_NAMES", `${names.join(", ")} et ${last}`);
+		}
+		ink.setVariable("NB_PLAYERS", names.length);
 		const ink_data = ink.runLines();
 		// set ink.state after game-running message, so state is not sent to players (big and useless for them)
 		session.data.ink.state = ink.status;

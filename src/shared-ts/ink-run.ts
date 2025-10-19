@@ -1,6 +1,7 @@
 import type { GameStoryMetadata } from "@shared/types/GameStory";
 import type { StoryLine, Storychoice } from "@shared/types/InkStory";
 import { Story } from "inkjs/full";
+import grafana from "shared/grafana";
 // https://github.com/inkle/ink/blob/master/Documentation/RunningYourInk.md#getting-started-with-the-runtime-api
 import s3client from "shared/s3";
 
@@ -48,6 +49,17 @@ export class InkPlay {
 			roles,
 			gamemode: this.global?.gamemode,
 		};
+	}
+
+	setVariable(key: string, value: string | number | boolean): void {
+		try {
+			this.story.variablesState[key] = value;
+		} catch (err) {
+			grafana.recordException(err);
+		}
+	}
+	getVariable(key: string): string | number | boolean | undefined {
+		return this.story?.variablesState?.[key];
 	}
 
 	chooseChoice(index: number) {
