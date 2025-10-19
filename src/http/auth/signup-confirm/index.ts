@@ -11,6 +11,12 @@ import { wrap_http } from "shared/wrap";
 
 const client = new CognitoIdentityProviderClient({});
 
+const SAFE_TO_FORWARD_ERROR_CODES = [
+	"AliasExistsException",
+	"CodeMismatchException",
+	"ExpiredCodeException",
+];
+
 export async function LoginUsingSession(
 	username: string,
 	session: string,
@@ -96,7 +102,11 @@ export const handler = wrap_http(
 			return {
 				status: 500,
 				cors: true,
-				json: { error: "Failed to confirm user creation" },
+				json: {
+					error: SAFE_TO_FORWARD_ERROR_CODES.includes(error?.name)
+						? error.name
+						: "Failed to confirm user creation",
+				},
 			};
 		}
 	}),

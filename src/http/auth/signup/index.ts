@@ -12,6 +12,12 @@ import { LoginUsingSession } from "../signup-confirm/index";
 
 const client = new CognitoIdentityProviderClient({});
 
+const SAFE_TO_FORWARD_ERROR_CODES = [
+	"CodeDeliveryFailureException",
+	"InvalidPasswordException",
+	"UsernameExistsException",
+];
+
 export async function StartSignUp(
 	input: SignupRequest,
 	ip: string | undefined = undefined,
@@ -96,7 +102,11 @@ export const handler = wrap_http(
 			return {
 				status: 500,
 				cors: true,
-				json: { error: "Failed to create account" },
+				json: {
+					error: SAFE_TO_FORWARD_ERROR_CODES.includes(error?.name)
+						? error.name
+						: "Failed to create account",
+				},
 			};
 		}
 	}),
