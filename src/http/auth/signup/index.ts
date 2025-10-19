@@ -25,6 +25,10 @@ export async function StartSignUp(
 				Name: "email",
 				Value: input.email,
 			},
+			{
+				Name: "custom:consent_email",
+				Value: input.consent_email.join(","),
+			},
 		],
 		UserContextData: {
 			IpAddress: ip,

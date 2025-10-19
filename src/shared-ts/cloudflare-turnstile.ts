@@ -39,6 +39,15 @@ export async function validateChallenge(
 				`Failed turnstile validation: ${validation["error-codes"].join(", ")}`,
 			);
 
+		if (
+			process.env?.DEV_ONLY_IGNORE_TURNSTILE === "true" &&
+			process.env.CLOUDFLARE_TURNSTILE_SECRET.startsWith(
+				"1x0000000000000000000000",
+			)
+		) {
+			return;
+		}
+
 		if (validation.action !== expected_action)
 			throw new Error(`Invalid action: ${validation.action}`);
 
