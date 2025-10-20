@@ -119,3 +119,7 @@ characters
 
 stories
   id *String
+
+storiesAchievements
+  storyId *String
+  id **String

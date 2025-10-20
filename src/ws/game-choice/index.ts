@@ -5,6 +5,7 @@ import type {
 	APIGatewayProxyWebsocketEventV2,
 	Context,
 } from "aws-lambda";
+import { getAchievement } from "shared/achievements";
 import { getGameSession, updateGameSession } from "shared/game-sessions";
 import { getPlayableStory } from "shared/ink-run";
 import { wrap_ws } from "shared/wrap";
@@ -78,6 +79,28 @@ export const main = async (
 				});
 			}),
 		);
+
+		const tags = ink_data.lines.flatMap((line) =>
+			line.tags.filter((tag) => tag.startsWith("achievement:")),
+		);
+		if (tags.length >= 1) {
+			const achievements = await Promise.all(
+				tags.map((tag) => {
+					return getAchievement(session.data.ink.id, tag.split(":").pop());
+				}),
+			);
+			await Promise.allSettled(
+				session.players.map((p) => {
+					return arc.ws.send({
+						id: p.socketId,
+						payload: JSON.stringify({
+							action: "earn-achievements",
+							achievements,
+						}),
+					});
+				}),
+			);
+		}
 	} else {
 		// Vote continue
 		await updateGameSession(session);
