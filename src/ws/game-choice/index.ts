@@ -5,8 +5,9 @@ import type {
 	APIGatewayProxyWebsocketEventV2,
 	Context,
 } from "aws-lambda";
-import { getAchievement } from "shared/achievements";
+import { getAchievement, giveAchievementToUser } from "shared/achievements";
 import { getGameSession, updateGameSession } from "shared/game-sessions";
+import grafana from "shared/grafana";
 import { getPlayableStory } from "shared/ink-run";
 import { wrap_ws } from "shared/wrap";
 import { z } from "zod";
@@ -90,14 +91,26 @@ export const main = async (
 				}),
 			);
 			await Promise.allSettled(
-				session.players.map((p) => {
-					return arc.ws.send({
-						id: p.socketId,
-						payload: JSON.stringify({
-							action: "earn-achievements",
-							achievements,
+				session.players.flatMap((p) => {
+					return [
+						...achievements.map((achievement) => {
+							return giveAchievementToUser(achievement, p.userId).catch(
+								(err) => {
+									grafana.error(
+										`Failed to give achievement ${achievement.id} to user ${p.userId}`,
+									);
+									grafana.recordException(err);
+								},
+							);
 						}),
-					});
+						arc.ws.send({
+							id: p.socketId,
+							payload: JSON.stringify({
+								action: "earn-achievements",
+								achievements,
+							}),
+						}),
+					];
 				}),
 			);
 		}

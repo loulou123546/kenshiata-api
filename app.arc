@@ -48,6 +48,9 @@ options /*
 /stories/metadata/:id
   method get
   src src/http/stories/get-metadata
+/stories/:id/achievements
+  method get
+  src src/http/stories/get-achievements
 /stories/by-author/:author
   method get
   src src/http/stories/by-author
@@ -79,6 +82,10 @@ options /*
 /auth/password-reset
   method post
   src src/http/auth/password-reset
+
+/users/:id/achievements
+  method get
+  src src/http/users/get-achievements
 
 post /open-socket
 
@@ -123,3 +130,7 @@ stories
 storiesAchievements
   storyId *String
   id **String
+
+playersAchievements
+  userId *String
+  achievementId **String

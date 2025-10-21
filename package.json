@@ -9,7 +9,7 @@
 		"doc": "cd shared/docs && node main.mjs && npx asyncapi start studio asyncapi.yaml"
 	},
 	"devDependencies": {
-		"@architect/architect": "^11.2.2",
+		"@architect/architect": "^11.3.0",
 		"@architect/plugin-typescript": "^2.1.0",
 		"@aws-sdk/lib-dynamodb": "^3.821.0",
 		"@biomejs/biome": "1.9.4",
