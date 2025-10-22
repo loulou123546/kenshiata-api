@@ -51,6 +51,7 @@ export const handler = wrap_http(
 				json: { error: "Invalid body" },
 			};
 		}
+
 		try {
 			const auth = await refreshTokens(data.refresh_token);
 

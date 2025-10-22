@@ -6,6 +6,7 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import { LoginRequest, type LoginResponse } from "@shared/types/Auth";
 import grafana from "shared/grafana";
+import { rateLimit } from "shared/rate-limit";
 import { wrap_http } from "shared/wrap";
 
 const client = new CognitoIdentityProviderClient({});
@@ -66,6 +67,18 @@ export const handler = wrap_http(
 				json: { error: "Invalid body" },
 			};
 		}
+
+		try {
+			await rateLimit(`login:${data.username}`, 15, 300); // 15 attempt in 5 minutes
+			await rateLimit("login:__global", 150, 300); // no more than 150 attemps globally in 5 minutes
+		} catch {
+			return {
+				status: 429,
+				cors: true,
+				json: { error: "Too many attempts, wait 5 minutes" },
+			};
+		}
+
 		try {
 			// @ts-ignore IP may exist but not garanteed
 			const auth = await initAuth(data, req?.requestContext?.http?.sourceIp);

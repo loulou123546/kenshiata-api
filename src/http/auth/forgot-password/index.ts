@@ -7,6 +7,7 @@ import {
 import { ForgotPasswordRequest } from "@shared/types/Auth";
 import { validateChallenge } from "shared/cloudflare-turnstile";
 import grafana from "shared/grafana";
+import { rateLimit } from "shared/rate-limit";
 import { wrap_http } from "shared/wrap";
 
 const client = new CognitoIdentityProviderClient({});
@@ -50,6 +51,18 @@ export const handler = wrap_http(
 				json: { error: "Invalid body" },
 			};
 		}
+
+		try {
+			await rateLimit(`forgot-password:${data.username}`, 5, 300); // 5 attempt in 5 minutes
+			await rateLimit("forgot-password:__global", 50, 300); // no more than 50 attemps globally in 5 minutes
+		} catch {
+			return {
+				status: 429,
+				cors: true,
+				json: { error: "Too many attempts, wait 5 minutes" },
+			};
+		}
+
 		try {
 			// @ts-ignore IP may exist but not garanteed
 			const ip: string | undefined = req?.requestContext?.http?.sourceIp;

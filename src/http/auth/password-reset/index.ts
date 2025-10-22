@@ -6,6 +6,7 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import { type LoginResponse, ResetPasswordRequest } from "@shared/types/Auth";
 import grafana from "shared/grafana";
+import { rateLimit } from "shared/rate-limit";
 import { wrap_http } from "shared/wrap";
 import { initAuth } from "../login/index";
 
@@ -56,6 +57,18 @@ export const handler = wrap_http(
 				json: { error: "Invalid body" },
 			};
 		}
+
+		try {
+			await rateLimit(`reset-password:${data.username}`, 15, 300); // 15 attempt in 5 minutes
+			await rateLimit("reset-password:__global", 100, 300); // no more than 100 attemps globally in 5 minutes
+		} catch {
+			return {
+				status: 429,
+				cors: true,
+				json: { error: "Too many attempts, wait 5 minutes" },
+			};
+		}
+
 		try {
 			// @ts-ignore IP may exist but not garanteed
 			const ip: string | undefined = req?.requestContext?.http?.sourceIp;
