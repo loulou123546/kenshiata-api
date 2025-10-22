@@ -88,7 +88,7 @@ export class InkPlay {
 			choices: this.story.currentChoices.map(
 				(c: { text: string; tags: string[] }, i: number) => ({
 					text: c.text,
-					tags: c.tags,
+					tags: c.tags || [],
 					index: i,
 				}),
 			),

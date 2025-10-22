@@ -3,17 +3,13 @@ import type {
 	APIGatewayProxyWebsocketEventV2,
 	Context,
 } from "aws-lambda";
-import {
-	deleteGameRoom,
-	getGameRoomById,
-	updateGameRoom,
-} from "shared/game-rooms";
+import { deleteGameRoom, getGameRoomById } from "shared/game-rooms";
 import {
 	broadcastToGameSession,
 	convertGameRoomToSession,
 } from "shared/game-sessions";
 import grafana from "shared/grafana";
-import { broadcastAllSockets, getIdentityBySocketId } from "shared/sockets";
+import { getIdentityBySocketId } from "shared/sockets";
 import { wrap_ws } from "shared/wrap";
 import { z } from "zod";
 

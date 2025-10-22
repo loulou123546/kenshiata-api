@@ -86,6 +86,9 @@ options /*
 /users/:id/achievements
   method get
   src src/http/users/get-achievements
+/users/:id/game-sessions
+  method get
+  src src/http/users/get-game-sessions
 
 post /open-socket
 
@@ -103,6 +106,7 @@ session-broadcast
 vote-story
 player-ready
 game-choice
+game-join-back
 
 @tables
 
@@ -115,6 +119,10 @@ gameRooms
 
 gameSessions
   id *String
+
+userGameSessions
+  userId *String
+  sessionId **String
 
 playersOnline
   username *String

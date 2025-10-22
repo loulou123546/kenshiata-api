@@ -5,7 +5,12 @@ import type {
 	APIGatewayProxyWebsocketEventV2,
 	Context,
 } from "aws-lambda";
-import { getGameSession, updateGameSession } from "shared/game-sessions";
+import {
+	getGameSession,
+	setUserJoinedGameSession,
+	updateGameSession,
+} from "shared/game-sessions";
+import grafana from "shared/grafana";
 import { getPlayableStory } from "shared/ink-run";
 import { wrap_ws } from "shared/wrap";
 import { z } from "zod";
@@ -110,6 +115,20 @@ export const main = async (
 						action: "game-continue",
 						ink_data,
 					}),
+				});
+			}),
+		);
+
+		// register this new gameSession to each player
+		await Promise.allSettled(
+			session.players.map((p) => {
+				return setUserJoinedGameSession(
+					p.userId,
+					session.id,
+					p.data.character_id,
+					session.name,
+				).catch((err) => {
+					grafana.recordException(err);
 				});
 			}),
 		);
