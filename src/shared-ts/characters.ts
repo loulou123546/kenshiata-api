@@ -43,13 +43,15 @@ export async function newCharacter(
 		if (parsed.length < 3) throw new Error("Invalid base64 data");
 		if (!parsed[1].startsWith("image/"))
 			throw new Error("Uploaded something else than image");
+		const ts = Date.now();
 		await s3.put(
-			`public/avatars/${userId}:${character.id}`,
+			`public/avatars/${userId}:${character.id}:${ts}`,
 			Buffer.from(parsed[2] as string, "base64"),
 			{
 				ContentType: parsed[1],
 			},
 		);
+		character.avatar = `custom:${ts}`;
 	}
 	delete character.avatar_base64;
 	await client.put(character);
@@ -72,13 +74,24 @@ export async function updateCharacter(
 		if (parsed.length < 3) throw new Error("Invalid base64 data");
 		if (!parsed[1].startsWith("image/"))
 			throw new Error("Uploaded something else than image");
+		const ts = Date.now();
 		await s3.put(
-			`public/avatars/${character.userId}:${character.id}`,
+			`public/avatars/${character.userId}:${character.id}:${ts}`,
 			Buffer.from(parsed[2] as string, "base64"),
 			{
 				ContentType: parsed[1],
 			},
 		);
+		character.avatar = `custom:${ts}`;
+	}
+	if (oldCharacter.avatar.startsWith("custom:")) {
+		try {
+			await s3.delete(
+				`public/avatars/${character.userId}:${character.id}:${oldCharacter.avatar.split(":")[1]}`,
+			);
+		} catch {
+			// ignore
+		}
 	}
 	delete character.avatar_base64;
 	await client.put(character);
@@ -87,10 +100,20 @@ export async function updateCharacter(
 
 export async function deleteCharacter(character: CharacterId): Promise<void> {
 	const client = (await arc.tables()).characters;
+
 	try {
-		await s3.delete(`public/avatars/${character.userId}:${character.id}`);
+		const oldCharacter = await client.get({
+			userId: character.userId,
+			id: character.id,
+		});
+		if (oldCharacter.avatar.startsWith("custom:")) {
+			await s3.delete(
+				`public/avatars/${character.userId}:${character.id}:${oldCharacter.avatar.split(":")[1]}`,
+			);
+		}
 	} catch {
 		// ignore
 	}
+
 	await client.delete({ userId: character.userId, id: character.id });
 }
