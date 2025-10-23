@@ -82,13 +82,17 @@ export const main = async (
 	if (agreement) {
 		await Promise.allSettled(
 			session.players.map((p) => {
-				return arc.ws.send({
-					id: p.socketId,
-					payload: JSON.stringify({
-						action: "game-running",
-						session: session,
-					}),
-				});
+				return arc.ws
+					.send({
+						id: p.socketId,
+						payload: JSON.stringify({
+							action: "game-running",
+							session: session,
+						}),
+					})
+					.catch((err) => {
+						grafana.recordException(err);
+					});
 			}),
 		);
 
@@ -116,13 +120,17 @@ export const main = async (
 
 		await Promise.allSettled(
 			session.players.map((p) => {
-				return arc.ws.send({
-					id: p.socketId,
-					payload: JSON.stringify({
-						action: "game-continue",
-						ink_data,
-					}),
-				});
+				return arc.ws
+					.send({
+						id: p.socketId,
+						payload: JSON.stringify({
+							action: "game-continue",
+							ink_data,
+						}),
+					})
+					.catch((err) => {
+						grafana.recordException(err);
+					});
 			}),
 		);
 
@@ -142,14 +150,18 @@ export const main = async (
 	} else {
 		await Promise.allSettled(
 			session.players.map((p) => {
-				return arc.ws.send({
-					id: p.socketId,
-					payload: JSON.stringify({
-						action: "player-ready",
-						player: session.players[playerIndex],
-						role,
-					}),
-				});
+				return arc.ws
+					.send({
+						id: p.socketId,
+						payload: JSON.stringify({
+							action: "player-ready",
+							player: session.players[playerIndex],
+							role,
+						}),
+					})
+					.catch((err) => {
+						grafana.recordException(err);
+					});
 			}),
 		);
 	}

@@ -9,7 +9,7 @@ import {
 	convertGameRoomToSession,
 } from "shared/game-sessions";
 import grafana from "shared/grafana";
-import { getIdentityBySocketId } from "shared/sockets";
+import { getIdentityBySocketId, setGameSessionToUser } from "shared/sockets";
 import { wrap_ws } from "shared/wrap";
 import { z } from "zod";
 
@@ -49,6 +49,13 @@ export const main = async (
 			hostId,
 			...session,
 		});
+		await Promise.allSettled(
+			session.players.map((player) =>
+				setGameSessionToUser(player.userId, player.socketId, session.id).catch(
+					(err) => grafana.recordException(err),
+				),
+			),
+		);
 
 		await delay(1000); // Give a second for client game to process start-game before deleting the room
 		await deleteGameRoom(room.hostId, true);

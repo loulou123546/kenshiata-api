@@ -5,6 +5,7 @@ import type {
 	Context,
 } from "aws-lambda";
 import { getGameSession } from "shared/game-sessions";
+import grafana from "shared/grafana";
 import { wrap_ws } from "shared/wrap";
 import { z } from "zod";
 
@@ -30,13 +31,17 @@ export const main = async (
 	await Promise.allSettled(
 		session.players.map((p) => {
 			if (p.socketId === connectionId) return Promise.resolve();
-			return arc.ws.send({
-				id: p.socketId,
-				payload: JSON.stringify({
-					action: internal_action,
-					...internal_payload,
-				}),
-			});
+			return arc.ws
+				.send({
+					id: p.socketId,
+					payload: JSON.stringify({
+						action: internal_action,
+						...internal_payload,
+					}),
+				})
+				.catch((err) => {
+					grafana.recordException(err);
+				});
 		}),
 	);
 	return { statusCode: 200 };

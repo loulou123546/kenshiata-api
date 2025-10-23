@@ -11,7 +11,7 @@ import {
 } from "shared/game-sessions";
 import grafana from "shared/grafana";
 import { getPlayableStory } from "shared/ink-run";
-import { getIdentityBySocketId } from "shared/sockets";
+import { getIdentityBySocketId, setGameSessionToUser } from "shared/sockets";
 import { wrap_ws } from "shared/wrap";
 import { z } from "zod";
 
@@ -84,6 +84,12 @@ export const main = async (
 				}),
 			];
 		}),
+	);
+
+	await setGameSessionToUser(user.user.id, connectionId, session.id).catch(
+		(err) => {
+			grafana.recordException(err);
+		},
 	);
 
 	const ink = await getPlayableStory(session.data.ink.id);

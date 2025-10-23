@@ -53,16 +53,20 @@ export async function broadcastToGameSession(
 	action: string,
 	payload: object,
 ): Promise<void> {
-	await Promise.all(
+	await Promise.allSettled(
 		session.players.map((player) =>
-			arc.ws.send({
-				id: player.socketId,
-				payload: JSON.stringify({
-					action,
-					sessionId: session.id,
-					...payload,
+			arc.ws
+				.send({
+					id: player.socketId,
+					payload: JSON.stringify({
+						action,
+						sessionId: session.id,
+						...payload,
+					}),
+				})
+				.catch((err) => {
+					grafana.recordException(err);
 				}),
-			}),
 		),
 	);
 }

@@ -7,6 +7,7 @@ import type {
 } from "aws-lambda";
 import { getGameSession, updateGameSession } from "shared/game-sessions";
 import { getStory } from "shared/game-stories";
+import grafana from "shared/grafana";
 import { getPlayableStory } from "shared/ink-run";
 import { wrap_ws } from "shared/wrap";
 import { z } from "zod";
@@ -76,13 +77,17 @@ export const main = async (
 		await updateGameSession(session);
 		await Promise.allSettled(
 			session.players.map((p) => {
-				return arc.ws.send({
-					id: p.socketId,
-					payload: JSON.stringify({
-						action: "start-story",
-						session_data: session.data,
-					}),
-				});
+				return arc.ws
+					.send({
+						id: p.socketId,
+						payload: JSON.stringify({
+							action: "start-story",
+							session_data: session.data,
+						}),
+					})
+					.catch((err) => {
+						grafana.recordException(err);
+					});
 			}),
 		);
 	} else {
@@ -92,14 +97,18 @@ export const main = async (
 		await Promise.allSettled(
 			session.players.map((p) => {
 				if (p.socketId === connectionId) return Promise.resolve();
-				return arc.ws.send({
-					id: p.socketId,
-					payload: JSON.stringify({
-						action: "vote-story",
-						userId: player.userId,
-						storyId,
-					}),
-				});
+				return arc.ws
+					.send({
+						id: p.socketId,
+						payload: JSON.stringify({
+							action: "vote-story",
+							userId: player.userId,
+							storyId,
+						}),
+					})
+					.catch((err) => {
+						grafana.recordException(err);
+					});
 			}),
 		);
 	}

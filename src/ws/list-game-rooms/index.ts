@@ -6,7 +6,7 @@ import type {
 } from "aws-lambda";
 import { listAvailableGameRooms } from "shared/game-rooms";
 import grafana from "shared/grafana";
-import { broadcastAllSockets, getIdentityBySocketId } from "shared/sockets";
+import { getIdentityBySocketId } from "shared/sockets";
 import { wrap_ws } from "shared/wrap";
 
 export const main = async (

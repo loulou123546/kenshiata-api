@@ -78,13 +78,17 @@ export const main = async (
 
 		await Promise.allSettled(
 			session.players.map((p) => {
-				return arc.ws.send({
-					id: p.socketId,
-					payload: JSON.stringify({
-						action: "game-continue",
-						ink_data,
-					}),
-				});
+				return arc.ws
+					.send({
+						id: p.socketId,
+						payload: JSON.stringify({
+							action: "game-continue",
+							ink_data,
+						}),
+					})
+					.catch((err) => {
+						grafana.recordException(err);
+					});
 			}),
 		);
 
@@ -128,14 +132,18 @@ export const main = async (
 		await Promise.allSettled(
 			session.players.map((p) => {
 				if (p.socketId === connectionId) return Promise.resolve();
-				return arc.ws.send({
-					id: p.socketId,
-					payload: JSON.stringify({
-						action: "game-choice",
-						userId: player.userId,
-						choiceIndex,
-					}),
-				});
+				return arc.ws
+					.send({
+						id: p.socketId,
+						payload: JSON.stringify({
+							action: "game-choice",
+							userId: player.userId,
+							choiceIndex,
+						}),
+					})
+					.catch((err) => {
+						grafana.recordException(err);
+					});
 			}),
 		);
 	}

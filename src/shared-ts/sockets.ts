@@ -6,6 +6,7 @@ import {
 import type { UserIdentity } from "@shared/types/User";
 import { uuidv7 } from "uuidv7";
 import { batchGetItems } from "./aws-utils";
+import grafana from "./grafana";
 
 export async function initNewSocketAuth(user: UserIdentity): Promise<string> {
 	const client = (await arc.tables()).sockets;
@@ -35,6 +36,33 @@ export async function associateSocketToUser(
 	return { user: setup.userId, socketId };
 }
 
+export async function setGameSessionToUser(
+	userId: string,
+	socketId: string,
+	gameSession: string,
+) {
+	const client = (await arc.tables()).sockets;
+
+	await Promise.allSettled(
+		[`socket:${socketId}`, `user:${userId}`].map((id) =>
+			client
+				.update({
+					Key: {
+						id,
+					},
+					// @ts-ignore UpdateExpression is well defined in docs
+					UpdateExpression: "SET gameSession = :gamesession",
+					ExpressionAttributeValues: {
+						":gamesession": gameSession,
+					},
+				})
+				.catch((err) => {
+					grafana.recordException(err);
+				}),
+		),
+	);
+}
+
 export async function getIdentityByUserId(
 	userId: string,
 ): Promise<SocketIdentity> {
@@ -43,7 +71,11 @@ export async function getIdentityByUserId(
 	if (!userSocket || !userSocket.socketId) {
 		throw new Error("No socket associated with this user");
 	}
-	return { socketId: userSocket.socketId, user: userSocket.user };
+	return {
+		socketId: userSocket.socketId,
+		user: userSocket.user,
+		gameSession: userSocket?.gameSession,
+	};
 }
 
 export async function getIdentityBySocketId(
@@ -54,7 +86,7 @@ export async function getIdentityBySocketId(
 	if (!socket || !socket.user?.id) {
 		throw new Error("No user associated with this socket");
 	}
-	return { socketId, user: socket.user };
+	return { socketId, user: socket.user, gameSession: socket?.gameSession };
 }
 
 export async function closeSocketBySocketId(socketId: string): Promise<void> {
