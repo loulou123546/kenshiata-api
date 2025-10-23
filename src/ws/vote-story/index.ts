@@ -61,6 +61,7 @@ export const main = async (
 		session.data.ink = {
 			id: agreement,
 			metadata: story_ink.metadata,
+			last_texts: [],
 		};
 		session.data.roles_player = {};
 		if (story_ink?.metadata?.roles) {

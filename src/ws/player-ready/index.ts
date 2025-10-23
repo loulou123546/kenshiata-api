@@ -105,6 +105,13 @@ export const main = async (
 		const ink_data = ink.runLines();
 		// set ink.state after game-running message, so state is not sent to players (big and useless for them)
 		session.data.ink.state = ink.status;
+		session.data.ink.last_texts = [
+			...(session.data.ink.last_texts ?? []),
+			...ink_data.lines,
+		];
+		while (session.data.ink.last_texts.length > 15) {
+			session.data.ink.last_texts.shift();
+		}
 		await updateGameSession(session);
 
 		await Promise.allSettled(

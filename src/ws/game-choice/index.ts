@@ -61,6 +61,13 @@ export const main = async (
 
 		ink.chooseChoice(agreement);
 		const ink_data = ink.runLines();
+		session.data.ink.last_texts = [
+			...(session.data.ink.last_texts ?? []),
+			...ink_data.lines,
+		];
+		while (session.data.ink.last_texts.length > 15) {
+			session.data.ink.last_texts.shift();
+		}
 
 		session.data.ink.state = ink.status;
 

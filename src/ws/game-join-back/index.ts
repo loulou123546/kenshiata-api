@@ -91,11 +91,15 @@ export const main = async (
 
 	// this contain only partial data : ie. choices but not last lines of texts
 	const ink_data = ink.runLines();
+
 	await arc.ws.send({
 		id: connectionId,
 		payload: JSON.stringify({
 			action: "game-continue",
-			ink_data,
+			ink_data: {
+				choices: ink_data.choices,
+				lines: session.data.ink.last_texts,
+			},
 		}),
 	});
 

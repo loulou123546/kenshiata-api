@@ -113,6 +113,10 @@ game-join-back
 
 @tables
 
+rateLimit
+  id *String
+  expires TTL
+
 sockets
   id *String
   expires TTL
