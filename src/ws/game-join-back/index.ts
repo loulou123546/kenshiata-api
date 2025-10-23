@@ -63,14 +63,26 @@ export const main = async (
 
 	// refresh data (in fact socketId) for all users
 	await Promise.allSettled(
-		session.players.map((p) => {
-			return arc.ws.send({
-				id: p.socketId,
-				payload: JSON.stringify({
-					action: "update-player",
-					player: session.players[playerIndex],
+		session.players.flatMap((p) => {
+			// skip actual joining user
+			if (p.socketId === connectionId) return [];
+			return [
+				arc.ws.send({
+					id: p.socketId,
+					payload: JSON.stringify({
+						action: "update-player",
+						player: session.players[playerIndex],
+					}),
 				}),
-			});
+				arc.ws.send({
+					id: p.socketId,
+					payload: JSON.stringify({
+						action: "player-join-left",
+						join: true,
+						name: `${session.players[playerIndex].username} (${session.players[playerIndex].data.character_name})`,
+					}),
+				}),
+			];
 		}),
 	);
 

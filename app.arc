@@ -89,6 +89,9 @@ options /*
 /users/:id/game-sessions
   method get
   src src/http/users/get-game-sessions
+/users/:userId/game-sessions/:sessionId
+  method delete
+  src src/http/users/delete-game-sessions
 
 post /open-socket
 
