@@ -92,6 +92,12 @@ options /*
 /users/:userId/game-sessions/:sessionId
   method delete
   src src/http/users/delete-game-sessions
+/users/:id/email-consents
+  method get
+  src src/http/users/get-email-consents
+/users/:id/email-consents
+  method put
+  src src/http/users/put-email-consents
 
 post /open-socket
 

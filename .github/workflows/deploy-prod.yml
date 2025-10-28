@@ -44,6 +44,7 @@ jobs:
           TRACES_AUTH: ${{ secrets.TRACES_AUTH }}
           RUNNING_ENV: "prod"
           COGNITO_CLIENT_ID: "203t0a306t5vkid4kdeto2hs2i"
+          COGNITO_USER_POOL_ID: "eu-west-1_Fzpf4i9XY"
           CLOUDFLARE_TURNSTILE_SECRET: ${{ secrets.CLOUDFLARE_TURNSTILE_SECRET }}
       - name: Trigger deployment for Websocket API
         uses: nicholasarvelo/aws-cli-commands@v1.0.1
