@@ -9,6 +9,7 @@ module.exports = {
 				"TRACES_AUTH",
 				"RUNNING_ENV",
 				"COGNITO_CLIENT_ID",
+				"COGNITO_USER_POOL_ID",
 				"CLOUDFLARE_TURNSTILE_SECRET",
 			];
 			for (const key of keys) {
